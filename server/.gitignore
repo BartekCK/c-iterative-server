@@ -1,0 +1,4 @@
+server.dSYM/
+.vscode/
+.DS_STORE
+server
