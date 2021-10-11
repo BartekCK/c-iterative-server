@@ -7,9 +7,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 #define PENDING_CONNECTION_BACKLOG 50
+#define BUFFER_MAX 2042
 
 int err(char *s);
 struct sockaddr_in create_serv_addr(int port);
+char *read_message(int sock_fd);
+void send_message(int sock_fd, char *msg);
 
 int main(int argc, char const *argv[])
 {
@@ -23,24 +26,46 @@ int main(int argc, char const *argv[])
     }
 
     struct sockaddr_in serv_addr = create_serv_addr(3001);
+
     if (bind(listen_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
     {
         err("bind");
     }
 
+
     if (listen(listen_fd, PENDING_CONNECTION_BACKLOG) == -1)
     {
         err("listen");
     }
+    printf("The server is ready\n");
+
     while (1)
     {
         cli_len = sizeof(cli_addr);
-        conn_fd = accept(listen_fd, (struct sockaddr *)&cli_addr, &cli_len);
+        printf("Waiting on accept()\n");
+        if((conn_fd = accept(listen_fd, (struct sockaddr *)&cli_addr, &cli_len))== -1){
+            err("accept");
+        }
+        printf("New client connection completed successfully\n");
+
+        char * message = read_message(conn_fd);
+        printf("Reveived message: %s\n", message);
+        send_message(conn_fd, message);
 
         close(conn_fd);
     }
 
     return 0;
+}
+
+void send_message(int sock_fd, char *msg){
+    write(sock_fd, msg, sizeof(msg));
+}
+
+char * read_message(int sock_fd){
+    char msg[BUFFER_MAX] = "";
+    while(read(sock_fd, msg, BUFFER_MAX) > 0){}
+    return msg;
 }
 
 struct sockaddr_in create_serv_addr(int port)

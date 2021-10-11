@@ -2,3 +2,4 @@ server.dSYM/
 .vscode/
 .DS_STORE
 server
+a.out
