@@ -55,16 +55,20 @@ int main(int argc, char const *argv[])
         close(conn_fd);
     }
 
+    close(listen_fd);
     return 0;
 }
 
 void send_message(int sock_fd, char *msg){
-    write(sock_fd, msg, sizeof(msg));
+    write(sock_fd, msg, strlen(msg));
 }
 
 char * read_message(int sock_fd){
     char msg[BUFFER_MAX] = "";
-    while(read(sock_fd, msg, BUFFER_MAX) > 0){}
+    int n = read(sock_fd, msg, BUFFER_MAX - 1);
+    if(n == -1){
+        err("read");
+    }
     return msg;
 }
 
