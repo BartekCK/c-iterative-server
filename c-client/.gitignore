@@ -1,0 +1,5 @@
+cient.dSYM/
+.vscode/
+.DS_STORE
+client
+a.out
